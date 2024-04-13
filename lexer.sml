@@ -138,16 +138,50 @@ let
     (* literals and idents *)
     | tokenize ((#"'")::c::(#"'")::cs) acc = tokenize cs ((CHAR c)::acc)
     | tokenize ((#"\"")::cs) acc = read_string cs acc []
-    | tokenize (c::cs) acc = tokenize cs acc
+    | tokenize (L as (c::cs)) acc =
+      if ((ord c) >= 65 andalso (ord c) <= 90) orelse
+      ((ord c) >= 97 andalso (ord c) <= 122) then
+        read_ident cs acc [c]
+      else tokenize cs acc
+
   and 
 (*fun read_number [] acc true = String.toInt (implode acc)*)
     read_string (#"\""::cs) acc str_acc = tokenize cs ((STRING (implode
       (rev str_acc)))::acc)
   | read_string (c::cs) acc str_acc = read_string cs acc (c::str_acc)
   | read_string [] acc str_acc = tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
+  and
+    read_ident [] acc str_acc =  tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
+  | read_ident (L as (c::cs)) acc (str_acc: char list) =
+      case c of
+           (* BUG HERE tokens longer than one char do not terminate properly *)
+           #"@" => tokenize L (ILLEGAL (implode (rev str_acc))::acc)
+         | #"#" => tokenize L (ILLEGAL (implode (rev str_acc))::acc)
+         | #"$" => tokenize L (ILLEGAL (implode (rev str_acc))::acc)
+         | #"!" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"%" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"^" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"&" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"*" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"(" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #")" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"{" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"}" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"[" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"]" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"/" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"?" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"+" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"-" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"=" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #" " => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"\t" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"\n" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | _ => read_string cs acc (c::str_acc)
+         
 in rev (tokenize (explode str) []) end;
 fun tok_to_string (EOF) = "EOF"
-  | tok_to_string (IDENT x) = "IDENT("^x^")"
+  | tok_to_string (IDENT x) = "IDENT(\""^x^"\")"
   | tok_to_string (ILLEGAL x) = "ILLEGAL(\""^x^"\")"
   | tok_to_string (INT x) = "INT("^(Int.toString x)^")"
   | tok_to_string (FLOAT x) = "FLOAT("^(Real.toString x)^")"
