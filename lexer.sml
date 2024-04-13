@@ -19,7 +19,7 @@ datatype token = EOF
                | ASSIGN
                | PLUS
                | MINUS
-               | MUL
+               | STAR
                | DIV
                | EQ
                | NEQ
@@ -30,6 +30,7 @@ datatype token = EOF
                | LTE
                | AND
                | OR
+               | POUND (* for macros *)
                (* Keywords *)
                | RETURN
                | TYPEDEF
@@ -59,21 +60,22 @@ let
     | tokenize (#"]"::cs) acc = tokenize cs (RBRACKET::acc)
     | tokenize (#","::cs) acc = tokenize cs (COMMA::acc)
     | tokenize (#";"::cs) acc = tokenize cs (SEMICOLON::acc)
-    | tokenize ((#"=")::(#"=")::cs) acc = tokenize cs (EQ::acc)
-    | tokenize ((#"!")::(#"=")::cs) acc = tokenize cs (NEQ::acc)
-    | tokenize ((#"!")::cs) acc = tokenize cs (NOT::acc)
-    | tokenize ((#"=")::cs) acc = tokenize cs (ASSIGN::acc)
-    | tokenize ((#"<")::(#"=")::cs) acc = tokenize cs (LTE::acc)
-    | tokenize ((#">")::(#"=")::cs) acc = tokenize cs (GTE::acc)
-    | tokenize ((#"<")::cs) acc = tokenize cs (LT::acc)
-    | tokenize ((#">")::cs) acc = tokenize cs (GT::acc)
-    | tokenize ((#"+")::cs) acc = tokenize cs (PLUS::acc)
-    | tokenize ((#"-")::cs) acc = tokenize cs (MINUS::acc) (* no negatives? *)
-    | tokenize ((#"*")::cs) acc = tokenize cs (MUL::acc) (* no pointers? *)
-    | tokenize ((#"/")::cs) acc = tokenize cs (DIV::acc)
-    | tokenize ((#":")::cs) acc = tokenize cs (COLON::acc)
-    | tokenize ((#"&")::(#"&")::cs) acc = tokenize cs (AND::acc)
-    | tokenize ((#"|")::(#"|")::cs) acc = tokenize cs (OR::acc)
+    | tokenize (#":"::cs) acc = tokenize cs (COLON::acc)
+    | tokenize (#"="::(#"=")::cs) acc = tokenize cs (EQ::acc)
+    | tokenize (#"!"::(#"=")::cs) acc = tokenize cs (NEQ::acc)
+    | tokenize (#"!"::cs) acc = tokenize cs (NOT::acc)
+    | tokenize (#"="::cs) acc = tokenize cs (ASSIGN::acc)
+    | tokenize (#"<"::(#"=")::cs) acc = tokenize cs (LTE::acc)
+    | tokenize (#">"::(#"=")::cs) acc = tokenize cs (GTE::acc)
+    | tokenize (#"<"::cs) acc = tokenize cs (LT::acc)
+    | tokenize (#">"::cs) acc = tokenize cs (GT::acc)
+    | tokenize (#"+"::cs) acc = tokenize cs (PLUS::acc)
+    | tokenize (#"-"::cs) acc = tokenize cs (MINUS::acc) (* no negatives? *)
+    | tokenize (#"*"::cs) acc = tokenize cs (STAR::acc)
+    | tokenize (#"/"::cs) acc = tokenize cs (DIV::acc)
+    | tokenize (#"#"::cs) acc = tokenize cs (POUND::acc)
+    | tokenize (#"&"::(#"&")::cs) acc = tokenize cs (AND::acc)
+    | tokenize (#"|"::(#"|")::cs) acc = tokenize cs (OR::acc)
     (* Keywords *)
     | tokenize ((#"r")::(#"e")::(#"t")::(#"u")::(#"r")::(#"n")::cs) acc =
         tokenize cs (RETURN::acc)
@@ -109,7 +111,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (INT x) = "INT("^(Int.toString x)^")"
   | tok_to_string (FLOAT x) = "FLOAT("^(Real.toString x)^")"
   | tok_to_string (CHAR x) = "CHAR("^(implode [x])^")"
-  | tok_to_string (STRING x) = "String(\""^x^"\")"
+  | tok_to_string (STRING x) = "STRING(\""^x^"\")"
   | tok_to_string (LPAREN) = "LPAREN"
   | tok_to_string (RPAREN) = "RPAREN"
   | tok_to_string (LBRACE) = "LBRACE"
@@ -122,7 +124,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (ASSIGN) = "ASSIGN"
   | tok_to_string (PLUS) = "PLUS"
   | tok_to_string (MINUS) = "MINUS"
-  | tok_to_string (MUL) = "MUL"
+  | tok_to_string (STAR) = "STAR"
   | tok_to_string (DIV) = "DIV"
   | tok_to_string (EQ) = "EQ"
   | tok_to_string (NEQ) = "NEQ"
@@ -133,6 +135,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (LTE) = "LTE"
   | tok_to_string (AND) = "AND"
   | tok_to_string (OR) = "OR"
+  | tok_to_string (POUND) = "POUND"
   | tok_to_string (RETURN) = "RETURN"
   | tok_to_string (TYPEDEF) = "TYPEDEF"
   | tok_to_string (UNION) = "UNION"
