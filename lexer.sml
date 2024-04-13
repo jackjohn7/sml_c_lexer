@@ -177,6 +177,13 @@ let
          | #"\t" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"\n" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | c => read_ident cs acc (c::str_acc)
+  (*and
+
+  read_number (L as (c::cs)) acc str_acc =
+    case c of
+        #"." => read_float *)
+
+
 
 in rev (tokenize (explode str) []) end;
 fun tok_to_string (EOF) = "EOF"
