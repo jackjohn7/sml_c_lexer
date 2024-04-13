@@ -57,6 +57,7 @@ datatype token =
  | TYPEDEF
  | UNION
  | UNSIGNED
+ | CONST
  (* Primitive types *)
  | INTTYPE
  | FLOATTYPE
@@ -135,6 +136,8 @@ let
         tokenize cs (CHARTYPE::acc)
     | tokenize ((#"s")::(#"t")::(#"r")::(#"u")::(#"c")::(#"t")::cs) acc =
         tokenize cs (STRUCTTYPE::acc)
+    | tokenize ((#"c")::(#"o")::(#"n")::(#"s")::(#"t")::cs) acc =
+        tokenize cs (CONST::acc)
     (* literals and idents *)
     | tokenize ((#"'")::c::(#"'")::cs) acc = tokenize cs ((CHAR c)::acc)
     | tokenize ((#"\"")::cs) acc = read_string cs acc []
@@ -240,6 +243,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (RETURN) = "RETURN"
   | tok_to_string (TYPEDEF) = "TYPEDEF"
   | tok_to_string (UNION) = "UNION"
+  | tok_to_string (CONST) = "CONST"
   | tok_to_string (UNSIGNED) = "UNSIGNED"
   | tok_to_string (INTTYPE) = "INTTYPE"
   | tok_to_string (FLOATTYPE) = "FLOATTYPE"
