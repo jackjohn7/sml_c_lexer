@@ -126,7 +126,7 @@ in rev (tokenize (explode str) []) end;
 
 fun tok_to_string (EOF) = "EOF"
   | tok_to_string (IDENT x) = "IDENT("^x^")"
-  | tok_to_string (ILLEGAL x) = "ILLEGAL("^x^")"
+  | tok_to_string (ILLEGAL x) = "ILLEGAL(\""^x^"\")"
   | tok_to_string (INT x) = "INT("^(Int.toString x)^")"
   | tok_to_string (FLOAT x) = "FLOAT("^(Real.toString x)^")"
   | tok_to_string (CHAR x) = "CHAR("^(implode [x])^")"
