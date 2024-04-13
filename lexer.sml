@@ -34,6 +34,12 @@ datatype token = EOF
                | AND
                | OR
                | POUND (* for macros *)
+               | BWAND
+               | BWOR
+               | BWXOR
+               | BWOCOMP
+               | BWLSHIFT
+               | BWRSHIFT
                (* Keywords *)
                | RETURN
                | TYPEDEF
@@ -68,10 +74,13 @@ let
     | tokenize (#"!"::(#"=")::cs) acc = tokenize cs (NEQ::acc)
     | tokenize (#"!"::cs) acc = tokenize cs (NOT::acc)
     | tokenize (#"="::cs) acc = tokenize cs (ASSIGN::acc)
+    | tokenize (#"<"::(#"<")::cs) acc = tokenize cs (BWLSHIFT::acc)
     | tokenize (#"<"::(#"=")::cs) acc = tokenize cs (LTE::acc)
-    | tokenize (#">"::(#"=")::cs) acc = tokenize cs (GTE::acc)
     | tokenize (#"<"::cs) acc = tokenize cs (LT::acc)
+    | tokenize (#">"::(#">")::cs) acc = tokenize cs (BWRSHIFT::acc)
+    | tokenize (#">"::(#"=")::cs) acc = tokenize cs (GTE::acc)
     | tokenize (#">"::cs) acc = tokenize cs (GT::acc)
+    | tokenize (#"^"::cs) acc = tokenize cs (BWXOR::acc)
     | tokenize (#"+"::(#"+")::cs) acc = tokenize cs (INC::acc)
     | tokenize (#"-"::(#"-")::cs) acc = tokenize cs (DEC::acc)
     | tokenize (#"+"::cs) acc = tokenize cs (PLUS::acc)
@@ -80,9 +89,12 @@ let
     | tokenize (#"*"::cs) acc = tokenize cs (STAR::acc)
     | tokenize (#"/"::cs) acc = tokenize cs (DIV::acc)
     | tokenize (#"%"::cs) acc = tokenize cs (MOD::acc)
+    | tokenize (#"~"::cs) acc = tokenize cs (BWOCOMP::acc)
     | tokenize (#"#"::cs) acc = tokenize cs (POUND::acc)
     | tokenize (#"&"::(#"&")::cs) acc = tokenize cs (AND::acc)
+    | tokenize (#"&"::cs) acc = tokenize cs (BWAND::acc)
     | tokenize (#"|"::(#"|")::cs) acc = tokenize cs (OR::acc)
+    | tokenize (#"|"::cs) acc = tokenize cs (BWOR::acc)
     (* Keywords *)
     | tokenize ((#"r")::(#"e")::(#"t")::(#"u")::(#"r")::(#"n")::cs) acc =
         tokenize cs (RETURN::acc)
@@ -141,8 +153,14 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (GTE) = "GTE"
   | tok_to_string (LTE) = "LTE"
   | tok_to_string (AND) = "AND"
+  | tok_to_string (BWAND) = "BWAND"
   | tok_to_string (OR) = "OR"
+  | tok_to_string (BWOR) = "BWOR"
+  | tok_to_string (BWXOR) = "BWXOR"
   | tok_to_string (MOD) = "MOD"
+  | tok_to_string (BWOCOMP) = "BWOCOMP"
+  | tok_to_string (BWLSHIFT) = "BWLSHIFT"
+  | tok_to_string (BWRSHIFT) = "BWRSHIFT"
   | tok_to_string (INC) = "INC"
   | tok_to_string (DEC) = "DEC"
   | tok_to_string (POUND) = "POUND"
