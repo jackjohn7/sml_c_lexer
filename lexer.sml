@@ -50,6 +50,7 @@ datatype token = EOF
                | ASSIGN_BWLSHIFT
                | BWRSHIFT
                | ASSIGN_BWRSHIFT
+               | SIZEOF
                (* Keywords *)
                | RETURN
                | TYPEDEF
@@ -115,6 +116,8 @@ let
     | tokenize (#"|"::(#"|")::cs) acc = tokenize cs (OR::acc)
     | tokenize (#"|"::(#"=")::cs) acc = tokenize cs (ASSIGN_BWOR::acc)
     | tokenize (#"|"::cs) acc = tokenize cs (BWOR::acc)
+    | tokenize ((#"s")::(#"i")::(#"z")::(#"e")::(#"o")::(#"f")::cs) acc =
+        tokenize cs (SIZEOF::acc)
     (* Keywords *)
     | tokenize ((#"r")::(#"e")::(#"t")::(#"u")::(#"r")::(#"n")::cs) acc =
         tokenize cs (RETURN::acc)
@@ -143,7 +146,6 @@ let
   | read_string (c::cs) acc str_acc = read_string cs acc (c::str_acc)
   | read_string [] acc str_acc = tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
 in rev (tokenize (explode str) []) end;
-
 fun tok_to_string (EOF) = "EOF"
   | tok_to_string (IDENT x) = "IDENT("^x^")"
   | tok_to_string (ILLEGAL x) = "ILLEGAL(\""^x^"\")"
@@ -194,6 +196,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (INC) = "INC"
   | tok_to_string (DEC) = "DEC"
   | tok_to_string (POUND) = "POUND"
+  | tok_to_string (SIZEOF) = "SIZEOF"
   | tok_to_string (RETURN) = "RETURN"
   | tok_to_string (TYPEDEF) = "TYPEDEF"
   | tok_to_string (UNION) = "UNION"
