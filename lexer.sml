@@ -154,7 +154,6 @@ let
     read_ident [] acc str_acc =  tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
   | read_ident (L as (c::cs)) acc (str_acc: char list) =
       case c of
-           (* BUG HERE tokens longer than one char do not terminate properly *)
            #"@" => tokenize L (ILLEGAL (implode (rev str_acc))::acc)
          | #"#" => tokenize L (ILLEGAL (implode (rev str_acc))::acc)
          | #"$" => tokenize L (ILLEGAL (implode (rev str_acc))::acc)
@@ -177,7 +176,7 @@ let
          | #" " => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"\t" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"\n" => tokenize L (IDENT (implode (rev str_acc))::acc)
-         | _ => read_string cs acc (c::str_acc)
+         | c => read_ident cs acc (c::str_acc)
          
 in rev (tokenize (explode str) []) end;
 fun tok_to_string (EOF) = "EOF"
