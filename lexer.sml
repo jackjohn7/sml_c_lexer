@@ -14,6 +14,7 @@ datatype token = EOF
                | RBRACKET
                | COMMA
                | SEMICOLON
+               | COLON
                (* Operators *)
                | ASSIGN
                | PLUS
@@ -27,8 +28,18 @@ datatype token = EOF
                | LT
                | GTE
                | LTE
+               | AND
+               | OR
                (* Keywords *)
                | RETURN
+               | TYPEDEF
+               | UNION
+               | UNSIGNED
+               (* Primitive types *)
+               | INTTYPE
+               | FLOATTYPE
+               | CHARTYPE
+               | STRUCTTYPE
                ;
 
 
@@ -58,13 +69,32 @@ let
     | tokenize ((#">")::cs) acc = tokenize cs (GT::acc)
     | tokenize ((#"+")::cs) acc = tokenize cs (PLUS::acc)
     | tokenize ((#"-")::cs) acc = tokenize cs (MINUS::acc) (* no negatives? *)
-    | tokenize ((#"*")::cs) acc = tokenize cs (MUL::acc)
+    | tokenize ((#"*")::cs) acc = tokenize cs (MUL::acc) (* no pointers? *)
     | tokenize ((#"/")::cs) acc = tokenize cs (DIV::acc)
+    | tokenize ((#":")::cs) acc = tokenize cs (COLON::acc)
+    | tokenize ((#"&")::(#"&")::cs) acc = tokenize cs (AND::acc)
+    | tokenize ((#"|")::(#"|")::cs) acc = tokenize cs (OR::acc)
+    (* Keywords *)
     | tokenize ((#"r")::(#"e")::(#"t")::(#"u")::(#"r")::(#"n")::cs) acc =
         tokenize cs (RETURN::acc)
+    | tokenize ((#"u")::(#"n")::(#"i")::(#"o")::(#"n")::cs) acc =
+        tokenize cs (UNION::acc)
+    | tokenize ((#"t")::(#"y")::(#"p")::(#"e")::(#"d")::(#"e")::(#"f")::cs) acc =
+        tokenize cs (TYPEDEF::acc)
+    | tokenize ((#"u")::(#"n")::(#"s")::(#"i")::(#"g")::(#"n")::(#"e")::(#"d")::cs) acc =
+        tokenize cs (TYPEDEF::acc)
+    | tokenize ((#"i")::(#"n")::(#"t")::cs) acc =
+        tokenize cs (INTTYPE::acc)
+    | tokenize ((#"f")::(#"l")::(#"o")::(#"a")::(#"t")::cs) acc =
+        tokenize cs (FLOATTYPE::acc)
+    | tokenize ((#"c")::(#"h")::(#"a")::(#"r")::cs) acc =
+        tokenize cs (CHARTYPE::acc)
+    | tokenize ((#"s")::(#"t")::(#"r")::(#"u")::(#"c")::(#"t")::cs) acc =
+        tokenize cs (STRUCTTYPE::acc)
+    (* literals and idents *)
     | tokenize ((#"'")::c::(#"'")::cs) acc = tokenize cs ((CHAR c)::acc)
-    | tokenize ((#"\"")::cs) acc = acc (* temp *)
-    | tokenize (c::cs) acc = acc
+    | tokenize ((#"\"")::cs) acc = read_string cs acc []
+    | tokenize (c::cs) acc = tokenize cs acc
   and 
 (*fun read_number [] acc true = String.toInt (implode acc)*)
     read_string (#"\""::cs) acc str_acc = tokenize cs ((STRING (implode
@@ -79,6 +109,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (INT x) = "INT("^(Int.toString x)^")"
   | tok_to_string (FLOAT x) = "FLOAT("^(Real.toString x)^")"
   | tok_to_string (CHAR x) = "CHAR("^(implode [x])^")"
+  | tok_to_string (STRING x) = "String(\""^x^"\")"
   | tok_to_string (LPAREN) = "LPAREN"
   | tok_to_string (RPAREN) = "RPAREN"
   | tok_to_string (LBRACE) = "LBRACE"
@@ -87,6 +118,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (RBRACKET) = "RBRACKET"
   | tok_to_string (COMMA) = "COMMA"
   | tok_to_string (SEMICOLON) = "SEMICOLON"
+  | tok_to_string (COLON) = "COLON"
   | tok_to_string (ASSIGN) = "ASSIGN"
   | tok_to_string (PLUS) = "PLUS"
   | tok_to_string (MINUS) = "MINUS"
@@ -99,7 +131,16 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (LT) = "LT"
   | tok_to_string (GTE) = "GTE"
   | tok_to_string (LTE) = "LTE"
+  | tok_to_string (AND) = "AND"
+  | tok_to_string (OR) = "OR"
   | tok_to_string (RETURN) = "RETURN"
+  | tok_to_string (TYPEDEF) = "TYPEDEF"
+  | tok_to_string (UNION) = "UNION"
+  | tok_to_string (UNSIGNED) = "UNSIGNED"
+  | tok_to_string (INTTYPE) = "INTTYPE"
+  | tok_to_string (FLOATTYPE) = "FLOATTYPE"
+  | tok_to_string (CHARTYPE) = "CHARTYPE"
+  | tok_to_string (STRUCTTYPE) = "STRUCTTYPE"
   ;
 
 fun pp_list [] = ()
