@@ -1,67 +1,67 @@
-datatype token = EOF
-               | IDENT of string
-               | ILLEGAL of string
-               | INT of int
-               | FLOAT of real
-               | CHAR of char
-               | STRING of string
-               (* Syntax *)
-               | LPAREN
-               | RPAREN
-               | LBRACE
-               | RBRACE
-               | LBRACKET
-               | RBRACKET
-               | COMMA
-               | SEMICOLON
-               | COLON
-               (* Operators *)
-               | ASSIGN
-               | PLUS
-               | ASSIGN_PLUS
-               | MINUS
-               | ASSIGN_MINUS
-               | MOD
-               | ASSIGN_MOD
-               | INC
-               | DEC
-               | STAR
-               | ASSIGN_MUL
-               | DIV
-               | ASSIGN_DIV
-               | EQ
-               | NEQ
-               | NOT
-               | GT
-               | LT
-               | GTE
-               | LTE
-               | AND
-               | OR
-               | POUND (* for macros *)
-               | BWAND
-               | ASSIGN_BWAND
-               | BWOR
-               | ASSIGN_BWOR
-               | BWXOR
-               | ASSIGN_BWXOR
-               | BWOCOMP
-               | BWLSHIFT
-               | ASSIGN_BWLSHIFT
-               | BWRSHIFT
-               | ASSIGN_BWRSHIFT
-               | SIZEOF
-               (* Keywords *)
-               | RETURN
-               | TYPEDEF
-               | UNION
-               | UNSIGNED
-               (* Primitive types *)
-               | INTTYPE
-               | FLOATTYPE
-               | CHARTYPE
-               | STRUCTTYPE
-               ;
+datatype token =
+   EOF
+ | IDENT of string
+ | ILLEGAL of string
+ | INT of int
+ | FLOAT of real
+ | CHAR of char
+ | STRING of string
+ (* Syntax *)
+ | LPAREN
+ | RPAREN
+ | LBRACE
+ | RBRACE
+ | LBRACKET
+ | RBRACKET
+ | COMMA
+ | SEMICOLON
+ | COLON
+ (* Operators *)
+ | ASSIGN
+ | PLUS
+ | ASSIGN_PLUS
+ | MINUS
+ | ASSIGN_MINUS
+ | MOD
+ | ASSIGN_MOD
+ | INC
+ | DEC
+ | STAR
+ | ASSIGN_MUL
+ | DIV
+ | ASSIGN_DIV
+ | EQ
+ | NEQ
+ | NOT
+ | GT
+ | LT
+ | GTE
+ | LTE
+ | AND
+ | OR
+ | POUND (* for macros *)
+ | BWAND
+ | ASSIGN_BWAND
+ | BWOR
+ | ASSIGN_BWOR
+ | BWXOR
+ | ASSIGN_BWXOR
+ | BWOCOMP
+ | BWLSHIFT
+ | ASSIGN_BWLSHIFT
+ | BWRSHIFT
+ | ASSIGN_BWRSHIFT
+ | SIZEOF
+ (* Keywords *)
+ | RETURN
+ | TYPEDEF
+ | UNION
+ | UNSIGNED
+ (* Primitive types *)
+ | INTTYPE
+ | FLOATTYPE
+ | CHARTYPE
+ | STRUCTTYPE;
 
 
 fun tokenizeString str =
@@ -177,7 +177,7 @@ let
          | #"\t" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"\n" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | c => read_ident cs acc (c::str_acc)
-         
+
 in rev (tokenize (explode str) []) end;
 fun tok_to_string (EOF) = "EOF"
   | tok_to_string (IDENT x) = "IDENT(\""^x^"\")"
