@@ -64,6 +64,13 @@ datatype token =
  | CHARTYPE
  | STRUCTTYPE;
 
+exception UnwrapErr of string;
+
+fun unwrap_int (SOME x) = x
+  | unwrap_int NONE = (
+  raise UnwrapErr "Unwrap failed";
+  0
+  );
 
 fun tokenizeString str =
 (* For speed, build in reverse and reverse list afterward *)
@@ -141,6 +148,8 @@ let
     (* literals and idents *)
     | tokenize ((#"'")::c::(#"'")::cs) acc = tokenize cs ((CHAR c)::acc)
     | tokenize ((#"\"")::cs) acc = read_string cs acc []
+    | tokenize ((#"0")::(#"x")::cs) acc = read_hex cs acc []
+    | tokenize ((#"0")::(#"b")::cs) acc = read_bin cs acc []
     | tokenize (L as (c::cs)) acc =
       if ((ord c) >= 65 andalso (ord c) <= 90) orelse
       ((ord c) >= 97 andalso (ord c) <= 122) then
@@ -153,6 +162,36 @@ let
       (rev str_acc)))::acc)
   | read_string (c::cs) acc str_acc = read_string cs acc (c::str_acc)
   | read_string [] acc str_acc = tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
+  and
+    read_bin ((c as #"0")::cs) acc str_acc = read_bin cs acc (c::str_acc)
+  | read_bin ((c as #"1")::cs) acc str_acc = read_bin cs acc (c::str_acc)
+  | read_bin cs acc str_acc = tokenize cs ((INT (unwrap_int (StringCvt.scanString (Int.scan
+    StringCvt.BIN) (implode (rev str_acc)))))::acc)
+  and
+    read_hex ((c as #"0")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"1")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"2")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"3")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"4")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"5")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"6")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"7")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"8")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"9")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"A")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"B")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"C")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"D")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"E")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"F")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"a")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"b")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"c")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"d")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"e")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex ((c as #"f")::cs) acc str_acc = read_hex cs acc (c::str_acc)
+  | read_hex cs acc str_acc = tokenize cs ((INT (unwrap_int (StringCvt.scanString (Int.scan
+    StringCvt.HEX) (implode (rev str_acc)))))::acc)
   and
     read_ident [] acc str_acc =  tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
   | read_ident (L as (c::cs)) acc (str_acc: char list) =
@@ -250,6 +289,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (CHARTYPE) = "CHARTYPE"
   | tok_to_string (STRUCTTYPE) = "STRUCTTYPE"
   ;
+
 
 fun pp_list [] = ()
   | pp_list (t::ts) = (
