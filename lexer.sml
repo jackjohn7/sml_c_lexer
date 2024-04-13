@@ -19,6 +19,9 @@ datatype token = EOF
                | ASSIGN
                | PLUS
                | MINUS
+               | MOD
+               | INC
+               | DEC
                | STAR
                | DIV
                | EQ
@@ -69,10 +72,14 @@ let
     | tokenize (#">"::(#"=")::cs) acc = tokenize cs (GTE::acc)
     | tokenize (#"<"::cs) acc = tokenize cs (LT::acc)
     | tokenize (#">"::cs) acc = tokenize cs (GT::acc)
+    | tokenize (#"+"::(#"+")::cs) acc = tokenize cs (INC::acc)
+    | tokenize (#"-"::(#"-")::cs) acc = tokenize cs (DEC::acc)
     | tokenize (#"+"::cs) acc = tokenize cs (PLUS::acc)
     | tokenize (#"-"::cs) acc = tokenize cs (MINUS::acc) (* no negatives? *)
+    (* Could later match on last acc token (Ident) and specify ptr star *)
     | tokenize (#"*"::cs) acc = tokenize cs (STAR::acc)
     | tokenize (#"/"::cs) acc = tokenize cs (DIV::acc)
+    | tokenize (#"%"::cs) acc = tokenize cs (MOD::acc)
     | tokenize (#"#"::cs) acc = tokenize cs (POUND::acc)
     | tokenize (#"&"::(#"&")::cs) acc = tokenize cs (AND::acc)
     | tokenize (#"|"::(#"|")::cs) acc = tokenize cs (OR::acc)
@@ -135,6 +142,9 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (LTE) = "LTE"
   | tok_to_string (AND) = "AND"
   | tok_to_string (OR) = "OR"
+  | tok_to_string (MOD) = "MOD"
+  | tok_to_string (INC) = "INC"
+  | tok_to_string (DEC) = "DEC"
   | tok_to_string (POUND) = "POUND"
   | tok_to_string (RETURN) = "RETURN"
   | tok_to_string (TYPEDEF) = "TYPEDEF"
