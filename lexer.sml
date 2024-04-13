@@ -18,12 +18,17 @@ datatype token = EOF
                (* Operators *)
                | ASSIGN
                | PLUS
+               | ASSIGN_PLUS
                | MINUS
+               | ASSIGN_MINUS
                | MOD
+               | ASSIGN_MOD
                | INC
                | DEC
                | STAR
+               | ASSIGN_MUL
                | DIV
+               | ASSIGN_DIV
                | EQ
                | NEQ
                | NOT
@@ -35,11 +40,16 @@ datatype token = EOF
                | OR
                | POUND (* for macros *)
                | BWAND
+               | ASSIGN_BWAND
                | BWOR
+               | ASSIGN_BWOR
                | BWXOR
+               | ASSIGN_BWXOR
                | BWOCOMP
                | BWLSHIFT
+               | ASSIGN_BWLSHIFT
                | BWRSHIFT
+               | ASSIGN_BWRSHIFT
                (* Keywords *)
                | RETURN
                | TYPEDEF
@@ -74,26 +84,36 @@ let
     | tokenize (#"!"::(#"=")::cs) acc = tokenize cs (NEQ::acc)
     | tokenize (#"!"::cs) acc = tokenize cs (NOT::acc)
     | tokenize (#"="::cs) acc = tokenize cs (ASSIGN::acc)
+    | tokenize (#"<"::(#"<")::(#"=")::cs) acc = tokenize cs (ASSIGN_BWLSHIFT::acc)
     | tokenize (#"<"::(#"<")::cs) acc = tokenize cs (BWLSHIFT::acc)
     | tokenize (#"<"::(#"=")::cs) acc = tokenize cs (LTE::acc)
     | tokenize (#"<"::cs) acc = tokenize cs (LT::acc)
+    | tokenize (#">"::(#">")::(#"=")::cs) acc = tokenize cs (ASSIGN_BWRSHIFT::acc)
     | tokenize (#">"::(#">")::cs) acc = tokenize cs (BWRSHIFT::acc)
     | tokenize (#">"::(#"=")::cs) acc = tokenize cs (GTE::acc)
     | tokenize (#">"::cs) acc = tokenize cs (GT::acc)
+    | tokenize (#"^"::(#"=")::cs) acc = tokenize cs (ASSIGN_BWXOR::acc)
     | tokenize (#"^"::cs) acc = tokenize cs (BWXOR::acc)
+    | tokenize (#"+"::(#"=")::cs) acc = tokenize cs (ASSIGN_PLUS::acc)
     | tokenize (#"+"::(#"+")::cs) acc = tokenize cs (INC::acc)
-    | tokenize (#"-"::(#"-")::cs) acc = tokenize cs (DEC::acc)
     | tokenize (#"+"::cs) acc = tokenize cs (PLUS::acc)
+    | tokenize (#"-"::(#"=")::cs) acc = tokenize cs (ASSIGN_MINUS::acc)
+    | tokenize (#"-"::(#"-")::cs) acc = tokenize cs (DEC::acc)
     | tokenize (#"-"::cs) acc = tokenize cs (MINUS::acc) (* no negatives? *)
     (* Could later match on last acc token (Ident) and specify ptr star *)
+    | tokenize (#"*"::(#"=")::cs) acc = tokenize cs (ASSIGN_MUL::acc)
     | tokenize (#"*"::cs) acc = tokenize cs (STAR::acc)
+    | tokenize (#"/"::(#"=")::cs) acc = tokenize cs (ASSIGN_DIV::acc)
     | tokenize (#"/"::cs) acc = tokenize cs (DIV::acc)
+    | tokenize (#"%"::(#"=")::cs) acc = tokenize cs (ASSIGN_MOD::acc)
     | tokenize (#"%"::cs) acc = tokenize cs (MOD::acc)
     | tokenize (#"~"::cs) acc = tokenize cs (BWOCOMP::acc)
     | tokenize (#"#"::cs) acc = tokenize cs (POUND::acc)
     | tokenize (#"&"::(#"&")::cs) acc = tokenize cs (AND::acc)
+    | tokenize (#"&"::(#"=")::cs) acc = tokenize cs (ASSIGN_BWAND::acc)
     | tokenize (#"&"::cs) acc = tokenize cs (BWAND::acc)
     | tokenize (#"|"::(#"|")::cs) acc = tokenize cs (OR::acc)
+    | tokenize (#"|"::(#"=")::cs) acc = tokenize cs (ASSIGN_BWOR::acc)
     | tokenize (#"|"::cs) acc = tokenize cs (BWOR::acc)
     (* Keywords *)
     | tokenize ((#"r")::(#"e")::(#"t")::(#"u")::(#"r")::(#"n")::cs) acc =
@@ -142,9 +162,13 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (COLON) = "COLON"
   | tok_to_string (ASSIGN) = "ASSIGN"
   | tok_to_string (PLUS) = "PLUS"
+  | tok_to_string (ASSIGN_PLUS) = "ASSIGN_PLUS"
   | tok_to_string (MINUS) = "MINUS"
+  | tok_to_string (ASSIGN_MINUS) = "ASSIGN_MINUS"
   | tok_to_string (STAR) = "STAR"
+  | tok_to_string (ASSIGN_MUL) = "ASSIGN_MUL"
   | tok_to_string (DIV) = "DIV"
+  | tok_to_string (ASSIGN_DIV) = "ASSIGN_DIV"
   | tok_to_string (EQ) = "EQ"
   | tok_to_string (NEQ) = "NEQ"
   | tok_to_string (NOT) = "NOT"
@@ -154,13 +178,19 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (LTE) = "LTE"
   | tok_to_string (AND) = "AND"
   | tok_to_string (BWAND) = "BWAND"
+  | tok_to_string (ASSIGN_BWAND) = "ASSIGN_BWAND"
   | tok_to_string (OR) = "OR"
   | tok_to_string (BWOR) = "BWOR"
+  | tok_to_string (ASSIGN_BWOR) = "ASSIGN_BWOR"
   | tok_to_string (BWXOR) = "BWXOR"
+  | tok_to_string (ASSIGN_BWXOR) = "ASSIGN_BWXOR"
   | tok_to_string (MOD) = "MOD"
+  | tok_to_string (ASSIGN_MOD) = "ASSIGN_MOD"
   | tok_to_string (BWOCOMP) = "BWOCOMP"
   | tok_to_string (BWLSHIFT) = "BWLSHIFT"
+  | tok_to_string (ASSIGN_BWLSHIFT) = "ASSIGN_BWLSHIFT"
   | tok_to_string (BWRSHIFT) = "BWRSHIFT"
+  | tok_to_string (ASSIGN_BWRSHIFT) = "ASSIGN_BWRSHIFT"
   | tok_to_string (INC) = "INC"
   | tok_to_string (DEC) = "DEC"
   | tok_to_string (POUND) = "POUND"
