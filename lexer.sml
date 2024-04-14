@@ -150,6 +150,7 @@ let
     | tokenize ((#"\"")::cs) acc = read_string cs acc []
     | tokenize ((#"0")::(#"x")::cs) acc = read_hex cs acc []
     | tokenize ((#"0")::(#"b")::cs) acc = read_bin cs acc []
+    | tokenize ((#"0")::cs) acc = read_oct cs acc []
     | tokenize (L as (c::cs)) acc =
       if ((ord c) >= 65 andalso (ord c) <= 90) orelse
       ((ord c) >= 97 andalso (ord c) <= 122) then
@@ -162,6 +163,17 @@ let
       (rev str_acc)))::acc)
   | read_string (c::cs) acc str_acc = read_string cs acc (c::str_acc)
   | read_string [] acc str_acc = tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
+  and
+    read_oct ((c as #"0")::cs) acc str_acc = read_oct cs acc (c::str_acc)
+  | read_oct ((c as #"1")::cs) acc str_acc = read_oct cs acc (c::str_acc)
+  | read_oct ((c as #"2")::cs) acc str_acc = read_oct cs acc (c::str_acc)
+  | read_oct ((c as #"3")::cs) acc str_acc = read_oct cs acc (c::str_acc)
+  | read_oct ((c as #"4")::cs) acc str_acc = read_oct cs acc (c::str_acc)
+  | read_oct ((c as #"5")::cs) acc str_acc = read_oct cs acc (c::str_acc)
+  | read_oct ((c as #"6")::cs) acc str_acc = read_oct cs acc (c::str_acc)
+  | read_oct ((c as #"7")::cs) acc str_acc = read_oct cs acc (c::str_acc)
+  | read_oct cs acc str_acc = tokenize cs ((INT (unwrap_int (StringCvt.scanString (Int.scan
+    StringCvt.OCT) (implode (rev str_acc)))))::acc)
   and
     read_bin ((c as #"0")::cs) acc str_acc = read_bin cs acc (c::str_acc)
   | read_bin ((c as #"1")::cs) acc str_acc = read_bin cs acc (c::str_acc)
