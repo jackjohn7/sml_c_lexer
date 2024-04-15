@@ -193,12 +193,6 @@ let
   | read_number ((c as #".")::cs) acc str_acc = read_float cs acc (c::str_acc)
   | read_number cs acc str_acc = tokenize cs ((INT (unwrap_int (StringCvt.scanString (Int.scan
     StringCvt.DEC) (implode (rev str_acc)))))::acc)
-  and 
-(*fun read_number [] acc true = String.toInt (implode acc)*)
-    read_string (#"\""::cs) acc str_acc = tokenize cs ((STRING (implode
-      (rev str_acc)))::acc)
-  | read_string (c::cs) acc str_acc = read_string cs acc (c::str_acc)
-  | read_string [] acc str_acc = tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
   and
     read_oct ((c as #"0")::cs) acc str_acc = read_oct cs acc (c::str_acc)
   | read_oct ((c as #"1")::cs) acc str_acc = read_oct cs acc (c::str_acc)
@@ -240,6 +234,11 @@ let
   | read_hex ((c as #"f")::cs) acc str_acc = read_hex cs acc (c::str_acc)
   | read_hex cs acc str_acc = tokenize cs ((INT (unwrap_int (StringCvt.scanString (Int.scan
     StringCvt.HEX) (implode (rev str_acc)))))::acc)
+  and 
+    read_string (#"\""::cs) acc str_acc = tokenize cs ((STRING (implode
+      (rev str_acc)))::acc)
+  | read_string (c::cs) acc str_acc = read_string cs acc (c::str_acc)
+  | read_string [] acc str_acc = tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
   and
     read_ident [] acc str_acc =  tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
   | read_ident (L as (c::cs)) acc (str_acc: char list) =
@@ -267,15 +266,9 @@ let
          | #"\t" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"\n" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | c => read_ident cs acc (c::str_acc)
-  (*and
-
-  read_number (L as (c::cs)) acc str_acc =
-    case c of
-        #"." => read_float *)
-
-
 
 in rev (tokenize (explode str) []) end;
+
 fun tok_to_string (EOF) = "EOF"
   | tok_to_string (IDENT x) = "IDENT(\""^x^"\")"
   | tok_to_string (ILLEGAL x) = "ILLEGAL(\""^x^"\")"
@@ -337,7 +330,6 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (CHARTYPE) = "CHARTYPE"
   | tok_to_string (STRUCTTYPE) = "STRUCTTYPE"
   ;
-
 
 fun pp_list [] = ()
   | pp_list (t::ts) = (
