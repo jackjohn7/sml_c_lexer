@@ -64,7 +64,8 @@ datatype token =
  | INTTYPE
  | FLOATTYPE
  | CHARTYPE
- | STRUCTTYPE;
+ | STRUCTTYPE
+ | ENUMTYPE;
 
 exception UnwrapErr of string;
 
@@ -151,6 +152,8 @@ let
         tokenize cs (CHARTYPE::acc)
     | tokenize ((#"s")::(#"t")::(#"r")::(#"u")::(#"c")::(#"t")::cs) acc =
         tokenize cs (STRUCTTYPE::acc)
+    | tokenize ((#"e")::(#"n")::(#"u")::(#"m")::cs) acc =
+        tokenize cs (ENUMTYPE::acc)
     | tokenize ((#"c")::(#"o")::(#"n")::(#"s")::(#"t")::cs) acc =
         tokenize cs (CONST::acc)
     | tokenize ((#"f")::(#"o")::(#"r")::cs) acc =
@@ -244,7 +247,9 @@ let
   | read_hex cs acc str_acc = tokenize cs ((INT (unwrap_int (StringCvt.scanString (Int.scan
     StringCvt.HEX) (implode (rev str_acc)))))::acc)
   and 
-    read_string (#"\""::cs) acc str_acc = tokenize cs ((STRING (implode
+    read_string ((#"\\")::(#"\"")::cs) acc str_acc = read_string cs acc
+    ([#"\\", #"\""] @ str_acc)
+  | read_string (#"\""::cs) acc str_acc = tokenize cs ((STRING (implode
       (rev str_acc)))::acc)
   | read_string (c::cs) acc str_acc = read_string cs acc (c::str_acc)
   | read_string [] acc str_acc = tokenize [] ((ILLEGAL (implode (rev str_acc)))::acc)
@@ -273,6 +278,7 @@ let
          | #"+" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"-" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"=" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"," => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #" " => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"\t" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"\n" => tokenize L (IDENT (implode (rev str_acc))::acc)
@@ -343,6 +349,7 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (FLOATTYPE) = "FLOATTYPE"
   | tok_to_string (CHARTYPE) = "CHARTYPE"
   | tok_to_string (STRUCTTYPE) = "STRUCTTYPE"
+  | tok_to_string (ENUMTYPE) = "ENUMTYPE"
   ;
 
 fun pp_list [] = ()
