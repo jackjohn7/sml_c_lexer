@@ -58,6 +58,8 @@ datatype token =
  | UNSIGNED
  | CONST
  | FOR
+ | WHILE
+ | DO
  (* Primitive types *)
  | INTTYPE
  | FLOATTYPE
@@ -153,6 +155,10 @@ let
         tokenize cs (CONST::acc)
     | tokenize ((#"f")::(#"o")::(#"r")::cs) acc =
         tokenize cs (FOR::acc)
+    | tokenize ((#"w")::(#"h")::(#"i")::(#"l")::(#"e")::cs) acc =
+        tokenize cs (WHILE::acc)
+    | tokenize ((#"d")::(#"o")::cs) acc =
+        tokenize cs (DO::acc)
     (* literals and idents *)
     | tokenize ((#"'")::c::(#"'")::cs) acc = tokenize cs ((CHAR c)::acc)
     | tokenize ((#"\"")::cs) acc = read_string cs acc []
@@ -330,6 +336,8 @@ fun tok_to_string (EOF) = "EOF"
   | tok_to_string (UNION) = "UNION"
   | tok_to_string (CONST) = "CONST"
   | tok_to_string (FOR) = "FOR"
+  | tok_to_string (WHILE) = "WHILE"
+  | tok_to_string (DO) = "DO"
   | tok_to_string (UNSIGNED) = "UNSIGNED"
   | tok_to_string (INTTYPE) = "INTTYPE"
   | tok_to_string (FLOATTYPE) = "FLOATTYPE"
