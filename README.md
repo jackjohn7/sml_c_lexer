@@ -22,3 +22,11 @@ sml cli.sml examples/loops.c
 ```
 
 The program tokenizes the file then prints all of the tokens.
+
+# Todo
+
+These items are added as I think of them and removed as I 
+complete them.
+
+- "." character terminates IDENT and starts PROPERTY and
+starts PROPERTY elsewhere.

@@ -248,7 +248,7 @@ let
     StringCvt.HEX) (implode (rev str_acc)))))::acc)
   and 
     read_string ((#"\\")::(#"\"")::cs) acc str_acc = read_string cs acc
-    ([#"\\", #"\""] @ str_acc)
+    ((rev [#"\\", #"\""]) @ str_acc)
   | read_string (#"\""::cs) acc str_acc = tokenize cs ((STRING (implode
       (rev str_acc)))::acc)
   | read_string (c::cs) acc str_acc = read_string cs acc (c::str_acc)
@@ -273,6 +273,7 @@ let
          | #"]" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"/" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"?" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #";" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"<" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #">" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"+" => tokenize L (IDENT (implode (rev str_acc))::acc)
