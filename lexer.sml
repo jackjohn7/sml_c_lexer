@@ -14,8 +14,7 @@ datatype token =
  | LBRACKET
  | RBRACKET
  | COMMA
- | SEMICOLON
- | COLON
+ | SEMICOLON | COLON
  (* Operators *)
  | ASSIGN
  | PLUS
@@ -70,6 +69,12 @@ fun unwrap_int (SOME x) = x
   | unwrap_int NONE = (
   raise UnwrapErr "Unwrap failed";
   0
+  );
+
+fun unwrap_real (SOME x) = x
+  | unwrap_real NONE = (
+  raise UnwrapErr "Unwrap failed";
+  0.0
   );
 
 fun tokenizeString str =
@@ -155,8 +160,39 @@ let
       if ((ord c) >= 65 andalso (ord c) <= 90) orelse
       ((ord c) >= 97 andalso (ord c) <= 122) then
         read_ident cs acc [c]
+      else if ((ord c) >= 48 andalso (ord c) <= 57) then
+        read_number  cs acc [c]
       else tokenize cs acc
 
+  and
+    (* Read float to real *)
+    read_float ((c as #"0")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"1")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"2")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"3")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"4")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"5")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"6")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"7")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"8")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float ((c as #"9")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_float cs acc str_acc = tokenize cs ((FLOAT (unwrap_real
+    (Real.fromString (implode (rev str_acc)))))::acc)
+  and
+    (* Read numbers and read float if "." is met *)
+    read_number ((c as #"0")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"1")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"2")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"3")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"4")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"5")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"6")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"7")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"8")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #"9")::cs) acc str_acc = read_number cs acc (c::str_acc)
+  | read_number ((c as #".")::cs) acc str_acc = read_float cs acc (c::str_acc)
+  | read_number cs acc str_acc = tokenize cs ((INT (unwrap_int (StringCvt.scanString (Int.scan
+    StringCvt.DEC) (implode (rev str_acc)))))::acc)
   and 
 (*fun read_number [] acc true = String.toInt (implode acc)*)
     read_string (#"\""::cs) acc str_acc = tokenize cs ((STRING (implode
