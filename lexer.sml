@@ -155,7 +155,7 @@ let
     | tokenize ((#"\"")::cs) acc = read_string cs acc []
     | tokenize ((#"0")::(#"x")::cs) acc = read_hex cs acc []
     | tokenize ((#"0")::(#"b")::cs) acc = read_bin cs acc []
-    | tokenize ((#"0")::cs) acc = read_oct cs acc []
+    | tokenize ((#"0")::cs) acc = read_oct cs acc [#"0"]
     | tokenize (L as (c::cs)) acc =
       if ((ord c) >= 65 andalso (ord c) <= 90) orelse
       ((ord c) >= 97 andalso (ord c) <= 122) then
@@ -259,6 +259,8 @@ let
          | #"]" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"/" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"?" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #"<" => tokenize L (IDENT (implode (rev str_acc))::acc)
+         | #">" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"+" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"-" => tokenize L (IDENT (implode (rev str_acc))::acc)
          | #"=" => tokenize L (IDENT (implode (rev str_acc))::acc)
